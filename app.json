@@ -1,0 +1,7 @@
+{
+  "name": "MyRealmApp",
+  "displayName": "MyRealmApp",
+  "plugins": [
+    "expo-file-system"
+  ]
+}
