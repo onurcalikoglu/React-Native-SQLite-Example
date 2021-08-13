@@ -1,5 +1,4 @@
-import React, { useContext, useEffect } from 'react';
-import SQLite from 'react-native-sqlite-storage';
+import React, { useContext, useEffect, useState } from 'react';
 import {
     SafeAreaView,
     StatusBar,
@@ -14,22 +13,15 @@ import {
 
 import { StoreContext } from './Store';
 
-const db = SQLite.openDatabase(
-    {
-        name: 'rnSqliteSame',
-        location: 'default',
-    },
-    () => { },
-    error => { console.log(error) }
-);
-
 const Users = () => {
 
-    const { dataStore, selectedDataStore, textStore, numberStore } = useContext(StoreContext);
+    const { dataStore, selectedDataStore,loginStore, dbStore } = useContext(StoreContext);
     const [tempData, setLocalDbData] = dataStore;
     const [selectedData, setSelectedData] = selectedDataStore;
-    const [text, onChangeText] = textStore;
-    const [number, onChangeNumber] = numberStore;
+    const [loginStatus, setLoginStatus] = loginStore;
+    const [text, onChangeText] = useState("");
+    const [number, onChangeNumber] = useState("");
+    const db = dbStore;
     useEffect(() => {
         createTable();
         queryFunc();
@@ -56,15 +48,13 @@ const Users = () => {
             console.log(error);
         }
     };
-
     const dropFunc = () => {
         console.log('get data from table...');
         db.transaction((tx) => {
-            tx.executeSql(`DROP TABLE Users;`)
+            tx.executeSql(`DROP TABLE Users; DROP TABLE Login;`)
         });
         setLocalDbData([]);
     };
-
     const createTable = () => {
         db.transaction((tx) => {
             tx.executeSql(
@@ -134,7 +124,27 @@ const Users = () => {
         <SafeAreaView>
             <StatusBar />
             <View style={styles.textView}>
-                <Text style={styles.title}>SQLite React Native App</Text>
+                <View style={{
+                    paddingTop:5,
+                    flexDirection: "row",
+                    justifyContent: "space-between",
+                    paddingHorizontal: 20,
+                }}>
+                    <View style={{
+                        left:0,
+                        justifyContent: 'center',
+                        alignItems:"center",
+                }}>
+                        <Text style={styles.title}>SQLite React Native App</Text>
+                    </View>
+
+                    <TouchableOpacity
+                        style={styles.exit_button}
+                        onPress={() => setLoginStatus(false) }
+                    >
+                        <Text style={styles.buttonText}>Log Out</Text>
+                    </TouchableOpacity>
+                </View>
                 <Text style={styles.text}>User List</Text>
             </View>
             <ScrollView style={styles.scrollView}>
@@ -190,7 +200,7 @@ const styles = StyleSheet.create({
         fontWeight: '700',
     },
     scrollView: {
-        height: 400,
+        height: 300,
         margin: 10,
         borderRadius: 15,
     },
@@ -199,7 +209,7 @@ const styles = StyleSheet.create({
         margin: 12,
         borderWidth: 1,
         padding: 10,
-        borderRadius: 10,
+        borderRadius: 25,
         borderColor: '#023047',
         color: '#023047',
     },
@@ -212,21 +222,28 @@ const styles = StyleSheet.create({
         marginBottom: 5,
         borderRadius: 15,
     },
+    exit_button: {
+        backgroundColor: "#fb5b5a",
+        paddingVertical: 10,
+        paddingHorizontal: 15,
+        borderWidth: 1,
+        borderColor: '#fb5b5a',
+        borderRadius: 15,
+    },
     buttonText: {
         color: '#EEEEEE',
         fontSize: 16,
     },
     title: {
-        fontSize: 18,
+        fontSize: 22,
     },
     text: {
         fontSize: 16,
     },
 
     textView: {
-        alignItems: "center",
         padding: 5,
-        backgroundColor: '#219ebc'
+        backgroundColor: '#219ebc',
     },
 
     line: {

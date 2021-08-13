@@ -1,18 +1,26 @@
 import React from 'react'; 
-
+import SQLite from 'react-native-sqlite-storage';
 export const StoreContext = React.createContext(null)
+
+const db = SQLite.openDatabase(
+    {
+        name: 'rnSqliteSame',
+        location: 'default',
+    },
+    () => { },
+    error => { console.log(error) }
+);
 
 export default ({children})=> {
     const [tempData, setLocalDbData] = React.useState([]);
     const [selectedData, setSelectedData] = React.useState();
-    const [text, onChangeText] = React.useState(null);
-    const [number, onChangeNumber] = React.useState(null);
+    const [loginStatus, setLoginStatus] = React.useState(false);
 
     const store = {
         dataStore : [tempData,setLocalDbData],
         selectedDataStore:[selectedData,setSelectedData],
-        textStore:[text,onChangeText],
-        numberStore:[number,onChangeNumber]
+        loginStore:[loginStatus,setLoginStatus],
+        dbStore:db
     }
 
     return <StoreContext.Provider value={store}>{children}</StoreContext.Provider>
